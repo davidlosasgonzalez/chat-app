@@ -1,0 +1,90 @@
+body {
+    margin: 0;
+    background-color: rgb(187, 187, 187);
+    padding-bottom: 3rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        Helvetica, Arial, sans-serif;
+}
+
+header {
+    background-color: #333;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+div#register {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 25px;
+    place-content: center;
+    align-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+main.chatroom {
+    border: 1px solid #333;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 6px 6px 15px 5px rgba(0, 0, 0, 0.5);
+    height: 600px;
+    width: 1000px;
+    margin: 6rem auto;
+    display: flex;
+    flex-direction: column;
+}
+
+form.msg-form {
+    background: #333;
+    padding: 0.25rem;
+    display: flex;
+    height: 3rem;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+    flex: 0 1 auto;
+}
+
+input.msg {
+    border: none;
+    padding: 0 1rem;
+    flex-grow: 1;
+    border-radius: 2rem;
+    margin: 0.25rem;
+}
+
+input.msg:focus {
+    outline: none;
+}
+
+#form > button {
+    background: rgb(187, 187, 187);
+    border: none;
+    padding: 0 1rem;
+    margin: 0.25rem;
+    border-radius: 3px;
+    outline: none;
+    color: rgb(0, 0, 0);
+}
+
+ul.messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    flex: 1 1 auto;
+}
+
+ul.messages > li {
+    padding: 0.5rem 1rem;
+}
+
+ul.messages > li:nth-child(odd) {
+    background: #efefef;
+}
+
+@media(max-width: 1200px) {
+
+    main.chatroom {
+        width: 750px;
+    }
+
+}
