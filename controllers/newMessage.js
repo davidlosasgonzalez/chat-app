@@ -6,8 +6,6 @@ const newMessage = (req, res, next) => {
     try {
         const { message, idSender, idReceiver, createdAt } = req.body;
 
-        console.log(req.body);
-
         // Check if message exists.
         if (!message.length) {
             const error = new Error('A message is required!');

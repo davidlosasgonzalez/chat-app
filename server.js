@@ -15,7 +15,6 @@ const loginUser = require('./controllers/loginUser');
 const newMessage = require('./controllers/newMessage');
 const getMessages = require('./controllers/getMessages');
 const isUser = require('./middlewares/isUser');
-const { log } = require('console');
 
 // Middlewares
 app.use(express.urlencoded({ extended: true }));

@@ -31,6 +31,8 @@ const render = async () => {
 
     // Check if we receive info about the user.
     if (user) {
+        registerDiv.innerHTML = '';
+
         // Hide login form data.
         loginForm.style.visibility = 'hidden';
 
@@ -56,6 +58,8 @@ const render = async () => {
         msgForm.elements[2].removeAttribute('disabled');
 
         const frag = document.createDocumentFragment();
+
+        messagesUl.innerHTML = '';
 
         if (messages.length > 0) {
             for (const msg of messages) {

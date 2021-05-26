@@ -8,8 +8,6 @@ const messagesUl = document.querySelector('ul.messages');
 const connectSocket = async (currentUser) => {
     const socket = io();
 
-    // ! Problemon - Cada vez que se recarga la página o
-    // ! se envia un mensaje se ejecuta esto.
     socket.emit('currentUser', currentUser);
 
     /**
@@ -17,7 +15,9 @@ const connectSocket = async (currentUser) => {
      * ## Send Message ##
      * ##################
      */
-    msgForm.addEventListener('submit', async (e) => {
+    // ! Problemon - Con addEventListener se acumulan los eventos por lo que cada vez que se ejecuta
+    // ! connectSocket se envia un mensaje repetido a mayores.
+    msgForm.onsubmit = async (e) => {
         e.preventDefault();
         if (inputMsg.value) {
             try {
@@ -48,7 +48,7 @@ const connectSocket = async (currentUser) => {
                 throw new Error('Error saving the message in the database');
             }
         }
-    });
+    };
 
     /**
      * ####################
@@ -56,6 +56,7 @@ const connectSocket = async (currentUser) => {
      * ####################
      */
     socket.on('chat message', () => {
+        socket.disconnect();
         render();
     });
 
@@ -90,6 +91,7 @@ const connectSocket = async (currentUser) => {
      * ###################
      */
     socket.on('delete user', async () => {
+        console.warn('El usuario se desconecto');
         const option = document.querySelector(
             `option[value="${currentUser.name}"]`
         );
