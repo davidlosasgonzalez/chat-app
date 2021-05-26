@@ -2,6 +2,7 @@ require('dotenv').config();
 const { PORT } = process.env;
 const express = require('express');
 const path = require('path');
+const morgan = require('morgan');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
@@ -11,21 +12,26 @@ const io = new Server(server);
 // Imports
 const newUser = require('./controllers/newUser');
 const loginUser = require('./controllers/loginUser');
-const isUser = require('./controllers/isUser');
+const newMessage = require('./controllers/newMessage');
+const getMessages = require('./controllers/getMessages');
+const isUser = require('./middlewares/isUser');
+const { log } = require('console');
 
 // Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '/public')));
+app.use(morgan('dev'));
 
 // Routes
 app.post('/users', newUser);
 app.post('/users/login', loginUser);
-app.get('/users/auth', isUser);
+app.post('/messages', isUser, newMessage);
+app.get('/messages', isUser, getMessages);
 
 // Error middleware.
 app.use((error, req, res, next) => {
-    // console.log(error.message);
+    console.log(error.message);
     res.status(error.httpStatus || 500).send({
         status: 'error',
         message: error.message,
@@ -46,11 +52,12 @@ let connectedUsers = [];
 io.on('connect', (socket) => {
     socket.on('currentUser', (currentUser) => {
         const userExists = connectedUsers.find(
-            (user) => user.username === currentUser
+            (user) => user.name === currentUser.name
         );
 
         connectedUsers.push({
-            username: currentUser,
+            id: currentUser.id,
+            name: currentUser.name,
             socketId: socket.id,
         });
 
@@ -69,20 +76,21 @@ io.on('connection', (socket) => {
             (user) => user.socketId === socket.id
         );
 
-        let receiverId;
+        msgInfo.sender = (sender && sender.name) || null;
 
-        if (msgInfo.receiver) {
+        let idReceiver;
+
+        if (msgInfo.idReceiver) {
             const receiver = connectedUsers.find(
-                (user) => user.username === msgInfo.receiver
+                (user) => user.id === msgInfo.idReceiver
             );
 
-            receiverId = receiver.socketId;
+            idReceiver = receiver.socketId;
+            msgInfo.receiver = receiver.name;
         }
 
-        msgInfo.sender = sender.username;
-
         if (msgInfo.receiver) {
-            io.to(receiverId).emit('chat message', msgInfo);
+            io.to(idReceiver).emit('chat message', msgInfo);
             io.to(socket.id).emit('chat message', msgInfo);
         } else {
             io.emit('chat message', msgInfo);

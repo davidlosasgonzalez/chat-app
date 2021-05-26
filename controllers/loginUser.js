@@ -3,28 +3,29 @@ const dbPath = path.join(__dirname, '../bbdd/chatroom.db');
 const db = require('better-sqlite3')(dbPath);
 const jwt = require('jsonwebtoken');
 
-const loginUser = async (req, res, next) => {
+const loginUser = (req, res, next) => {
     try {
-        const { username, password } = req.body;
-        if (!username || !password) {
+        const { name, password } = req.body;
+
+        if (!name || !password) {
             const error = new Error('Missing inputs!');
             error.httpStatus = 400;
             throw error;
         }
 
         const user = db
-            .prepare('SELECT * FROM users WHERE username=? AND password=?;')
-            .all(username, password);
+            .prepare('SELECT * FROM users WHERE name=? AND password=?;')
+            .all(name, password);
 
-        if (user.length === 0) {
-            const error = new Error('Incorrect username or password!');
+        if (user.length < 1) {
+            const error = new Error('Incorrect name or password!');
             error.httpStatus = 401;
             throw error;
         }
 
         const tokenInfo = {
             id: user[0].id,
-            username: user[0].username,
+            name: user[0].name,
         };
 
         let token;

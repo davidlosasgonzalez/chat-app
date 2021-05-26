@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "eslint": "^7.27.0",
+    "morgan": "^1.10.0",
     "nodemon": "^2.0.7",
     "prettier": "^2.3.0"
   }

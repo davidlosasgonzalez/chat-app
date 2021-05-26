@@ -40,8 +40,8 @@ form.msg-form {
     display: flex;
     height: 3rem;
     box-sizing: border-box;
-    backdrop-filter: blur(10px);
     flex: 0 1 auto;
+    height: 50px;
 }
 
 input.msg {
@@ -71,6 +71,14 @@ ul.messages {
     margin: 0;
     padding: 0;
     flex: 1 1 auto;
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+    width: 0; /* Remove scrollbar space */
+    background: transparent; /* Optional: just make scrollbar invisible */
 }
 
 ul.messages > li {
@@ -81,10 +89,8 @@ ul.messages > li:nth-child(odd) {
     background: #efefef;
 }
 
-@media(max-width: 1200px) {
-
+@media (max-width: 1200px) {
     main.chatroom {
         width: 750px;
     }
-
 }

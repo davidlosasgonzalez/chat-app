@@ -2,19 +2,19 @@ const path = require('path');
 const dbPath = path.join(__dirname, '../bbdd/chatroom.db');
 const db = require('better-sqlite3')(dbPath);
 
-const newUser = async (req, res, next) => {
+const newUser = (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { name, password } = req.body;
 
-        // Get user with body username.
-        const existingUsername = db
-            .prepare(`SELECT id FROM users WHERE username=?;`)
-            .all(username);
+        // Get user by name.
+        const existingUser = db
+            .prepare(`SELECT id FROM users WHERE name=?;`)
+            .all(name);
 
         // Check if username is taken by another user.
-        if (existingUsername.length > 0) {
+        if (existingUser.length > 0) {
             const error = new Error(
-                'The username used belongs to an existing user!'
+                'The name used belongs to an existing user!'
             );
             error.httpStatus = 409;
             throw error;
@@ -22,9 +22,9 @@ const newUser = async (req, res, next) => {
 
         // Insert user in db.
         db.prepare(
-            `INSERT INTO users(username, password)
+            `INSERT INTO users(user, password)
                 VALUES(?, ?);`
-        ).run(username, password);
+        ).run(user, password);
 
         res.send({
             status: 'ok',

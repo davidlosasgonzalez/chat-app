@@ -35,13 +35,9 @@ const isUser = async (req, res, next) => {
             }
         }
 
-        res.send({
-            status: 'ok',
-            user: {
-                id: tokenInfo.id,
-                username: tokenInfo.username,
-            },
-        });
+        req.userAuth = tokenInfo;
+
+        next();
     } catch (error) {
         next(error);
     }
