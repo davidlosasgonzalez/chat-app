@@ -22,9 +22,9 @@ const newUser = (req, res, next) => {
 
         // Insert user in db.
         db.prepare(
-            `INSERT INTO users(user, password)
+            `INSERT INTO users(name, password)
                 VALUES(?, ?);`
-        ).run(user, password);
+        ).run(name, password);
 
         res.send({
             status: 'ok',

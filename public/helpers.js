@@ -1,92 +1,39 @@
-import connectSocket from './socket.js';
-
-const loginForm = document.querySelector('header > form.login-form');
-const registerDiv = document.querySelector('div#register');
 const messagesUl = document.querySelector('ul.messages');
 const msgForm = document.querySelector('form.msg-form');
 
 /**
- * ############
- * ## Render ##
- * ############
+ * ###################
+ * ## printMessages ##
+ * ###################
  */
-const render = async () => {
-    const token = await JSON.parse(localStorage.getItem('token'));
+function printMessages(messages, username) {
+    const frag = document.createDocumentFragment();
 
-    const myHeaders = new Headers({
-        'Content-Type': 'application/json',
-        Authorization: token,
-    });
+    if (messages.length > 0) {
+        for (const msg of messages) {
+            const msgInfo = {
+                sender: msg.senderName,
+                receiver: msg.receiverName,
+                text: msg.text,
+                createdAt: msg.createdAt,
+            };
 
-    const response = await fetch('http://localhost:4000/messages', {
-        method: 'get',
-        headers: myHeaders,
-    });
+            const item = listMessages(msgInfo, username);
 
-    const { data } = await response.json();
-    const user = data ? data.user : null;
-    const messages = data ? data.messages : null;
-
-    if (user) connectSocket(user);
-
-    // Check if we receive info about the user.
-    if (user) {
-        registerDiv.innerHTML = '';
-
-        // Hide login form data.
-        loginForm.style.visibility = 'hidden';
-
-        // Create a paragraph with user name.
-        const p = document.createElement('p');
-        p.textContent = user.name;
-        p.style.cssText = `
-            margin-right: 10px;
-            color: #fff;
-            font-weight: bold;
-        `;
-
-        // Create a button to logout.
-        const logoutBtn = document.createElement('button');
-        logoutBtn.setAttribute('id', 'logout-btn');
-        logoutBtn.textContent = 'Logout';
-
-        // Append button to header.
-        registerDiv.append(p, logoutBtn);
-
-        msgForm.elements[0].removeAttribute('disabled');
-        msgForm.elements[1].removeAttribute('disabled');
-        msgForm.elements[2].removeAttribute('disabled');
-
-        const frag = document.createDocumentFragment();
-
-        messagesUl.innerHTML = '';
-
-        if (messages.length > 0) {
-            for (const msg of messages) {
-                const msgInfo = {
-                    sender: msg.senderName,
-                    receiver: msg.receiverName,
-                    text: msg.text,
-                    createdAt: msg.createdAt,
-                };
-
-                const item = listMessages(msgInfo, user.name);
-
-                frag.append(item);
-            }
-
-            messagesUl.append(frag);
+            frag.append(item);
         }
-        messagesUl.scrollTop = messagesUl.scrollHeight;
+
+        messagesUl.append(frag);
     }
-};
+    messagesUl.scrollTop = messagesUl.scrollHeight;
+}
 
 /**
  * ################
  * ## getMessage ##
  * ################
  */
-const getMessage = (msg, color) => {
+function showError(msg, color) {
     const existP = document.querySelector('header > form > p');
 
     if (!existP) {
@@ -104,14 +51,14 @@ const getMessage = (msg, color) => {
 
         setTimeout(() => p.remove(), 3000);
     }
-};
+}
 
 /**
  * ##################
  * ## listMessages ##
  * ##################
  */
-const listMessages = (msgInfo, currentUser) => {
+function listMessages(msgInfo, currentUser) {
     const { sender, createdAt } = msgInfo;
     const receiver = msgInfo.receiver ? msgInfo.receiver : null;
     let { text } = msgInfo;
@@ -149,6 +96,69 @@ const listMessages = (msgInfo, currentUser) => {
     item.innerHTML += `<time>${formatDate}</time>`;
 
     return item;
-};
+}
 
-export { getMessage, listMessages, render };
+/**
+ * ######################
+ * ## addSelectOptions ##
+ * ######################
+ */
+function addSelectOptions(userlist) {
+    for (const user of userlist) {
+        if (user.name === user.name) continue;
+
+        const optionExists = document.querySelector(
+            `option[value="${user.name}"]`
+        );
+
+        if (!optionExists) {
+            // Create a new option with the user name.
+            const option = document.createElement('option');
+            option.setAttribute('value', user.name);
+            option.textContent = user.name;
+
+            // Append option to select and remove disable attribute.
+            msgForm.elements[0].append(option);
+        }
+    }
+}
+
+/**
+ * ########################
+ * ## removeSelectOption ##
+ * ########################
+ */
+function removeSelectOption(username) {
+    const option = document.querySelector(`option[value="${username}"]`);
+    if (option) option.remove();
+}
+/**
+ * ####################
+ * ## disconnectUser ##
+ * ####################
+ */
+function disconnectUser() {
+    const item = document.createElement('li');
+
+    item.style.cssText = `
+            color: grey;
+        `;
+
+    item.innerHTML =
+        '<p>⚠️ ¡Has sido desconectado porque has iniciado sesión en otra ventana!</p>';
+
+    messagesUl.append(item);
+
+    messagesUl.scrollTop = messagesUl.scrollHeight;
+
+    msgForm.innerHTML = '';
+}
+
+export {
+    showError,
+    listMessages,
+    addSelectOptions,
+    removeSelectOption,
+    printMessages,
+    disconnectUser,
+};

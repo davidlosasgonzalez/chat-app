@@ -4,17 +4,18 @@ const db = require('better-sqlite3')(dbPath);
 
 const newMessage = (req, res, next) => {
     try {
-        const { message, idSender, idReceiver, createdAt } = req.body;
+        const { id: idSender } = req.userAuth;
+        const { text, idReceiver, createdAt } = req.body;
 
-        // Check if message exists.
-        if (!message.length) {
+        // Check if text exists.
+        if (!text.length) {
             const error = new Error('A message is required!');
             error.httpStatus = 409;
             throw error;
         }
 
-        // Check message length.
-        if (message.length >= 300) {
+        // Check text length.
+        if (text.length >= 300) {
             const error = new Error(
                 'Message length cant be over 300 characters!'
             );
@@ -38,7 +39,7 @@ const newMessage = (req, res, next) => {
         db.prepare(
             `INSERT INTO messages(text, idSender, idReceiver, createdAt)
                 VALUES(?, ?, ?, ?);`
-        ).run(message, idSender, idReceiver, createdAt);
+        ).run(text, idSender, idReceiver, createdAt);
 
         res.send({
             status: 'ok',

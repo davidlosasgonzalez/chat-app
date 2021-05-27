@@ -8,6 +8,7 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
+const jwt = require('jsonwebtoken');
 
 // Imports
 const newUser = require('./controllers/newUser');
@@ -29,7 +30,7 @@ app.post('/messages', isUser, newMessage);
 app.get('/messages', isUser, getMessages);
 
 // Error middleware.
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
     console.log(error.message);
     res.status(error.httpStatus || 500).send({
         status: 'error',
@@ -47,16 +48,32 @@ app.use((req, res) => {
 
 let connectedUsers = [];
 
-// Nueva conexión.
-io.on('connect', (socket) => {
-    socket.on('currentUser', (currentUser) => {
-        const userExists = connectedUsers.find(
-            (user) => user.name === currentUser.name
+io.use((socket, next) => {
+    if (socket.handshake.query && socket.handshake.query.token) {
+        jwt.verify(
+            socket.handshake.query.token,
+            process.env.SECRET,
+            (error, decoded) => {
+                if (error) return next(new Error('Authentication error'));
+                socket.decoded = decoded;
+                next();
+            }
         );
+    } else {
+        next(new Error('Authentication error'));
+    }
+}).on('connection', function (socket) {
+    // Add new user to "connectedUsers".
+    socket.on('userConnected', (user) => {
+        const { name, id } = user;
+
+        const userExists = connectedUsers.find((user) => {
+            return user.name === name && user.id === id;
+        });
 
         connectedUsers.push({
-            id: currentUser.id,
-            name: currentUser.name,
+            id,
+            name,
             socketId: socket.id,
         });
 
@@ -66,16 +83,14 @@ io.on('connect', (socket) => {
             io.to(userExists.socketId).emit('multiple connections');
         }
     });
-});
 
-// Enviar mensaje.
-io.on('connection', (socket) => {
+    // User send a new message.
     socket.on('chat message', (msgInfo) => {
         const sender = connectedUsers.find(
             (user) => user.socketId === socket.id
         );
 
-        msgInfo.sender = (sender && sender.name) || null;
+        msgInfo.senderName = (sender && sender.name) || null;
 
         let idReceiver;
 
@@ -85,7 +100,7 @@ io.on('connection', (socket) => {
             );
 
             idReceiver = receiver.socketId;
-            msgInfo.receiver = receiver.name;
+            msgInfo.receiverName = receiver.name;
         }
 
         if (msgInfo.receiver) {
@@ -95,15 +110,18 @@ io.on('connection', (socket) => {
             io.emit('chat message', msgInfo);
         }
     });
-});
 
-// Desconexión.
-io.on('connection', (socket) => {
+    // User disconnect
     socket.on('disconnect', () => {
+        const user = connectedUsers.find((user) => {
+            return user.socketId === socket.id;
+        });
+
         connectedUsers = connectedUsers.filter(
             (user) => user.socketId !== socket.id
         );
-        io.emit('delete user');
+
+        io.emit('delete user', user.name);
     });
 });
 
