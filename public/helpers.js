@@ -103,9 +103,11 @@ function listMessages(msgInfo, currentUser) {
  * ## addSelectOptions ##
  * ######################
  */
-function addSelectOptions(userlist) {
+function addSelectOptions(userlist, currentUser) {
+    msgForm.elements[0].innerHTML = `<option value="">Destinatario</option>`;
+
     for (const user of userlist) {
-        if (user.name === user.name) continue;
+        if (currentUser === user.name) continue;
 
         const optionExists = document.querySelector(
             `option[value="${user.name}"]`
@@ -123,15 +125,6 @@ function addSelectOptions(userlist) {
     }
 }
 
-/**
- * ########################
- * ## removeSelectOption ##
- * ########################
- */
-function removeSelectOption(username) {
-    const option = document.querySelector(`option[value="${username}"]`);
-    if (option) option.remove();
-}
 /**
  * ####################
  * ## disconnectUser ##
@@ -158,7 +151,6 @@ export {
     showError,
     listMessages,
     addSelectOptions,
-    removeSelectOption,
     printMessages,
     disconnectUser,
 };

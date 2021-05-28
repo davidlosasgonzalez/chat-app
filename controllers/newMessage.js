@@ -5,7 +5,7 @@ const db = require('better-sqlite3')(dbPath);
 const newMessage = (req, res, next) => {
     try {
         const { id: idSender } = req.userAuth;
-        const { text, idReceiver, createdAt } = req.body;
+        const { text, receiver, createdAt } = req.body;
 
         // Check if text exists.
         if (!text.length) {
@@ -23,17 +23,25 @@ const newMessage = (req, res, next) => {
             throw error;
         }
 
-        // Get user.
-        const existingUser = db
+        // Get sender.
+        const existingSender = db
             .prepare(`SELECT id FROM users WHERE id=?;`)
             .all(idSender);
 
-        // Check if userexists.
-        if (existingUser.length < 1) {
+        // Check if sender exists.
+        if (existingSender.length < 1) {
             const error = new Error('User not found!');
             error.httpStatus = 409;
             throw error;
         }
+
+        // Get receiver.
+        const existingReceiver = db
+            .prepare(`SELECT id FROM users WHERE name=?;`)
+            .all(receiver);
+
+        let idReceiver =
+            (existingReceiver[0] && existingReceiver[0].id) || null;
 
         // Insert user in db.
         db.prepare(

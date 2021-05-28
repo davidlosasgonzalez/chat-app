@@ -1,17 +1,15 @@
-import {
-    printMessages,
-    addSelectOptions,
-    removeSelectOption,
-    disconnectUser,
-} from './helpers.js';
+import { printMessages, addSelectOptions, disconnectUser } from './helpers.js';
 
-let username;
+let currentUser;
 
 const token = JSON.parse(localStorage.getItem('token'));
 
-// eslint-disable-next-line no-undef
+// Socket init. Before connecting, we check whether
+// the user is authorised.
 const socket = io('http://localhost:4000', {
     query: { token },
+    transports: ['websocket'],
+    upgrade: false,
 });
 
 // Show all errors with the socket connection.
@@ -19,39 +17,32 @@ socket.on('connect_error', (error) => {
     console.error(error.message);
 });
 
-// Send user info to the socket.
-function userConnected(user) {
-    username = user.name;
-    socket.emit('userConnected', user);
-}
+// It receives the user's name and stores it in currentUser.
+socket.on('username', (username) => {
+    currentUser = username;
+});
 
 // Send user message info to socket.
 function userMessage(msgInfo) {
-    socket.emit('chat message', msgInfo);
+    socket.emit('send_message', msgInfo);
 }
 
 // Receive user messages.
-socket.on('chat message', (msgInfo) => {
-    printMessages([msgInfo], username);
+socket.on('receive_message', (msgInfo) => {
+    printMessages([msgInfo], currentUser);
 });
 
 // If a new user logs in a new <option> is added
 // to <select>.
 socket.on('userlist', (userlist) => {
-    addSelectOptions(userlist);
-});
-
-// If a user logs of the <option> with his name
-// is deleted.
-socket.on('delete user', (username) => {
-    removeSelectOption(username);
+    addSelectOptions(userlist, currentUser);
 });
 
 // If a user logs in from a new tab the previous
 // session is disconnected
-socket.on('multiple connections', () => {
+socket.on('multisession', () => {
     disconnectUser();
     socket.disconnect();
 });
 
-export { userConnected, userMessage };
+export { userMessage };

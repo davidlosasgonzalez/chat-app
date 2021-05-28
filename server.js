@@ -30,7 +30,7 @@ app.post('/messages', isUser, newMessage);
 app.get('/messages', isUser, getMessages);
 
 // Error middleware.
-app.use((error, req, res) => {
+app.use((error, req, res, _) => {
     console.log(error.message);
     res.status(error.httpStatus || 500).send({
         status: 'error',
@@ -50,21 +50,19 @@ let connectedUsers = [];
 
 io.use((socket, next) => {
     if (socket.handshake.query && socket.handshake.query.token) {
+        let user;
+
         jwt.verify(
             socket.handshake.query.token,
             process.env.SECRET,
             (error, decoded) => {
                 if (error) return next(new Error('Authentication error'));
                 socket.decoded = decoded;
-                next();
+                user = decoded;
             }
         );
-    } else {
-        next(new Error('Authentication error'));
-    }
-}).on('connection', function (socket) {
-    // Add new user to "connectedUsers".
-    socket.on('userConnected', (user) => {
+
+        // Add new user to "connectedUsers".
         const { name, id } = user;
 
         const userExists = connectedUsers.find((user) => {
@@ -77,51 +75,56 @@ io.use((socket, next) => {
             socketId: socket.id,
         });
 
-        if (!userExists) {
-            io.emit('userlist', connectedUsers);
-        } else {
-            io.to(userExists.socketId).emit('multiple connections');
-        }
-    });
+        io.on('connect', () => {
+            io.to(socket.id).emit('username', user.name);
 
+            if (!userExists) {
+                io.emit('userlist', connectedUsers);
+            } else {
+                io.to(userExists.socketId).emit('multisession');
+            }
+        });
+
+        next();
+    } else {
+        next(new Error('Authentication error'));
+    }
+}).on('connect', (socket) => {
     // User send a new message.
-    socket.on('chat message', (msgInfo) => {
+    socket.on('send_message', (msgInfo) => {
         const sender = connectedUsers.find(
             (user) => user.socketId === socket.id
         );
 
         msgInfo.senderName = (sender && sender.name) || null;
 
-        let idReceiver;
+        let receiverSocketId;
 
-        if (msgInfo.idReceiver) {
+        if (msgInfo.receiver) {
             const receiver = connectedUsers.find(
-                (user) => user.id === msgInfo.idReceiver
+                (user) => user.name === msgInfo.receiver
             );
-
-            idReceiver = receiver.socketId;
+            receiverSocketId = receiver.socketId;
             msgInfo.receiverName = receiver.name;
         }
 
+        console.log(msgInfo);
+
         if (msgInfo.receiver) {
-            io.to(idReceiver).emit('chat message', msgInfo);
-            io.to(socket.id).emit('chat message', msgInfo);
+            io.to(receiverSocketId).emit('receive_message', msgInfo);
+            io.to(socket.id).emit('receive_message', msgInfo);
         } else {
-            io.emit('chat message', msgInfo);
+            io.emit('receive_message', msgInfo);
         }
     });
 
     // User disconnect
     socket.on('disconnect', () => {
-        const user = connectedUsers.find((user) => {
-            return user.socketId === socket.id;
-        });
-
         connectedUsers = connectedUsers.filter(
             (user) => user.socketId !== socket.id
         );
 
-        io.emit('delete user', user.name);
+        io.emit('userlist', connectedUsers);
     });
 });
 

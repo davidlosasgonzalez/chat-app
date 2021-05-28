@@ -1,6 +1,5 @@
 import { showError, printMessages } from './helpers.js';
-
-import { userMessage, userConnected } from './socket.js';
+import { userMessage } from './socket.js';
 
 const header = document.querySelector('body > header');
 const loginForm = document.querySelector('header > form.login-form');
@@ -159,7 +158,7 @@ msgForm.addEventListener('submit', async (e) => {
 
             const msgInfo = {
                 text: inputMsg.value,
-                idReceiver: select.value || null,
+                receiver: select.value || null,
                 createdAt: new Date(),
             };
 
@@ -184,34 +183,37 @@ msgForm.addEventListener('submit', async (e) => {
  * ############
  */
 async function render() {
-    const token = await JSON.parse(localStorage.getItem('token'));
+    try {
+        const token = JSON.parse(localStorage.getItem('token')) || '';
 
-    const myHeaders = new Headers({
-        'Content-Type': 'application/json',
-        Authorization: token,
-    });
+        const myHeaders = new Headers({
+            'Content-Type': 'application/json',
+            Authorization: token,
+        });
 
-    const response = await fetch('http://localhost:4000/messages', {
-        method: 'get',
-        headers: myHeaders,
-    });
+        const response = await fetch('http://localhost:4000/messages', {
+            method: 'get',
+            headers: myHeaders,
+        });
 
-    const { data } = await response.json();
+        const { data } = await response.json();
 
-    // Si no existe data daremos por hecho que el usuario no tiene
-    // un token válido.
-    if (!data) return false;
+        // Si no existe data daremos por hecho que el usuario no tiene
+        // un token válido.
+        if (!data) return false;
 
-    const { user, messages } = data;
+        const { user, messages } = data;
 
-    // Conectamos el socket.
-    userConnected(user);
+        addLogoutButton(user);
 
-    addLogoutButton(user);
+        messagesUl.innerHTML = '';
 
-    messagesUl.innerHTML = '';
+        printMessages(messages, user.name);
 
-    printMessages(messages, user.name);
+        return true;
+    } catch (error) {
+        console.error('Authentication error');
+    }
 }
 
 // Llamamos a render.
