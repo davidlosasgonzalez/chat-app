@@ -6,6 +6,15 @@ const newUser = (req, res, next) => {
     try {
         const { name, password } = req.body;
 
+        // Check if name or password have less than 4 characters.
+        if (name.length < 4 || password.length < 4) {
+            const error = new Error(
+                'Username and password must be at least 4 characters long!'
+            );
+            error.httpStatus = 409;
+            throw error;
+        }
+
         // Get user by name.
         const existingUser = db
             .prepare(`SELECT id FROM users WHERE name=?;`)

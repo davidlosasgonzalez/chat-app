@@ -1,3 +1,4 @@
+const { log } = require('console');
 const path = require('path');
 const dbPath = path.join(__dirname, '../bbdd/chatroom.db');
 const db = require('better-sqlite3')(dbPath);

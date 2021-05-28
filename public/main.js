@@ -1,4 +1,4 @@
-import { showError, printMessages } from './helpers.js';
+import { showError as showInfo, printMessages } from './helpers.js';
 import { userMessage } from './socket.js';
 
 const header = document.querySelector('body > header');
@@ -9,7 +9,7 @@ const registerBtn = document.querySelector('button#register-btn');
 const inputMsg = document.querySelector('input.msg');
 const msgForm = document.querySelector('main > form.msg-form');
 const select = document.querySelector('select#user');
-const messagesUl = document.querySelector('ul.messages');
+const messagesDiv = document.querySelector('div.messages');
 
 /**
  * #####################
@@ -19,33 +19,12 @@ const messagesUl = document.querySelector('ul.messages');
 registerBtn.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    const name = loginForm.elements.name.value;
-    const password = loginForm.elements.password.value;
-
     try {
-        if (name.length < 4 || password.length < 4) {
-            throw new Error(
-                'Username and password must be at least 4 characters long!'
-            );
-        }
+        await credentialsQuery('http://localhost:4000/users');
 
-        const params = {
-            name,
-            password,
-        };
-
-        await fetch('http://localhost:4000/users', {
-            method: 'post',
-            body: JSON.stringify(params),
-            headers: { 'Content-type': 'application/json' },
-        });
-
-        loginForm.elements.name.value = '';
-        loginForm.elements.password.value = '';
-
-        showError('Registration completed! Please, login to chat!', 'green');
+        showInfo('Registration completed! Please, login to chat!', 'green');
     } catch (error) {
-        showError(error.message, '#E65A3C');
+        showInfo(error.message, '#E65A3C');
     }
 });
 
@@ -57,39 +36,16 @@ registerBtn.addEventListener('click', async (e) => {
 loginBtn.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    const name = loginForm.elements.name.value;
-    const password = loginForm.elements.password.value;
-
     try {
-        if (!name || !password) {
-            throw new Error('Username and password are required!');
-        }
-
-        const params = {
-            name,
-            password,
-        };
-
-        const response = await fetch('http://localhost:4000/users/login', {
-            method: 'post',
-            body: JSON.stringify(params),
-            headers: { 'Content-type': 'application/json' },
-        });
-
-        const { data } = await response.json();
-
-        if (!data) {
-            throw new Error('Wrong username or password!');
-        }
+        const { data } = await credentialsQuery(
+            'http://localhost:4000/users/login'
+        );
 
         localStorage.setItem('token', JSON.stringify(data.token));
 
-        loginForm.elements.name.value = '';
-        loginForm.elements.password.value = '';
-
         render();
     } catch (error) {
-        showError(error.message, '#E65A3C');
+        showInfo(error.message, '#E65A3C');
     }
 });
 
@@ -147,9 +103,10 @@ function addLogoutButton(user) {
  */
 msgForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     if (inputMsg.value) {
         try {
-            const token = await JSON.parse(localStorage.getItem('token'));
+            const token = JSON.parse(localStorage.getItem('token'));
 
             const myHeaders = new Headers({
                 'Content-Type': 'application/json',
@@ -162,20 +119,58 @@ msgForm.addEventListener('submit', async (e) => {
                 createdAt: new Date(),
             };
 
-            await fetch('http://localhost:4000/messages', {
+            const response = await fetch('http://localhost:4000/messages', {
                 method: 'post',
                 body: JSON.stringify(msgInfo),
                 headers: myHeaders,
             });
 
+            const data = await response.json();
+
+            if (data.status === 'error') {
+                throw new Error(data.message);
+            }
+
             userMessage(msgInfo);
 
             inputMsg.value = '';
         } catch (error) {
-            throw new Error('Error saving the message in the database');
+            throw new Error(error.message);
         }
     }
 });
+
+/**
+ * ######################
+ * ## credentialsQuery ##
+ * ######################
+ */
+async function credentialsQuery(URL) {
+    const name = loginForm.elements.name.value;
+    const password = loginForm.elements.password.value;
+
+    const params = {
+        name,
+        password,
+    };
+
+    const response = await fetch(URL, {
+        method: 'post',
+        body: JSON.stringify(params),
+        headers: { 'Content-type': 'application/json' },
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'error') {
+        throw new Error(data.message);
+    }
+
+    loginForm.elements.name.value = '';
+    loginForm.elements.password.value = '';
+
+    return data;
+}
 
 /**
  * ############
@@ -206,7 +201,7 @@ async function render() {
 
         addLogoutButton(user);
 
-        messagesUl.innerHTML = '';
+        messagesDiv.innerHTML = '';
 
         printMessages(messages, user.name);
 

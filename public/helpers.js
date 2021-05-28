@@ -1,5 +1,47 @@
-const messagesUl = document.querySelector('ul.messages');
+const messagesDiv = document.querySelector('div.messages');
 const msgForm = document.querySelector('form.msg-form');
+
+let day = 0;
+
+/**
+ * ##################
+ * ## listMessages ##
+ * ##################
+ */
+function listMessages(msgInfo, currentUser) {
+    const { sender, createdAt } = msgInfo;
+    const receiver = msgInfo.receiver ? msgInfo.receiver : null;
+    let { text } = msgInfo;
+
+    const item = document.createElement('div');
+
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    text = text.replace(urlRegex, '<a href="$1">$1</a>');
+
+    if (!receiver && sender === currentUser) {
+        item.innerHTML = `<p>${text}</p>`;
+    } else if (!receiver && sender !== currentUser) {
+        item.innerHTML = `<p><strong>${sender}:</strong> ${text}</p>`;
+    } else if (receiver && sender !== currentUser) {
+        item.innerHTML += `<p>⛔️ <strong>${sender}:</strong> ${text}</p>`;
+    } else {
+        item.innerHTML += `<p>⛔️ ${text} (to ${receiver})</p>`;
+    }
+
+    const formatDate = new Date(createdAt).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
+    const isoDate = new Date(createdAt).toISOString();
+
+    item.innerHTML += `<time datetime="${isoDate}">${formatDate}</time>`;
+
+    return {
+        item,
+        isoDate,
+    };
+}
 
 /**
  * ###################
@@ -18,22 +60,50 @@ function printMessages(messages, username) {
                 createdAt: msg.createdAt,
             };
 
-            const item = listMessages(msgInfo, username);
+            const { item, isoDate } = listMessages(msgInfo, username);
+
+            const { sender } = msgInfo;
+
+            if (sender === username) {
+                item.classList.add('from-me');
+            } else {
+                item.classList.add('from-them');
+            }
+
+            const date = new Date(isoDate);
+
+            if (date.getDate() > day) {
+                day = date.getDate();
+
+                const dateInfo = document.createElement('div');
+                dateInfo.classList.add('date-info');
+
+                const formatDate = date.toLocaleDateString('en-GB', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                });
+
+                dateInfo.innerHTML = `<hr><div>${formatDate}</div><hr>`;
+
+                frag.append(dateInfo);
+            }
 
             frag.append(item);
         }
 
-        messagesUl.append(frag);
+        messagesDiv.append(frag);
     }
-    messagesUl.scrollTop = messagesUl.scrollHeight;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 /**
- * ################
- * ## getMessage ##
- * ################
+ * ##############
+ * ## showInfo ##
+ * ##############
  */
-function showError(msg, color) {
+function showInfo(msg, color) {
     const existP = document.querySelector('header > form > p');
 
     if (!existP) {
@@ -51,51 +121,6 @@ function showError(msg, color) {
 
         setTimeout(() => p.remove(), 3000);
     }
-}
-
-/**
- * ##################
- * ## listMessages ##
- * ##################
- */
-function listMessages(msgInfo, currentUser) {
-    const { sender, createdAt } = msgInfo;
-    const receiver = msgInfo.receiver ? msgInfo.receiver : null;
-    let { text } = msgInfo;
-
-    const item = document.createElement('li');
-
-    item.style.cssText = `
-        color: green;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    `;
-
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    text = text.replace(urlRegex, '<a href="$1">$1</a>');
-
-    if (!receiver && sender === currentUser) {
-        item.innerHTML = `<p>🟢 ${text}</p>`;
-    } else if (!receiver && sender !== currentUser) {
-        item.style.color = 'blue';
-        item.innerHTML = `<p><strong>${sender}:</strong> ${text}</p>`;
-    } else if (receiver && sender !== currentUser) {
-        item.style.color = 'grey';
-        item.innerHTML += `<p>⛔️ <strong>${sender}:</strong> ${text}</p>`;
-    } else {
-        item.style.color = 'darkgreen';
-        item.innerHTML += `<p>⛔️ ${text} (to ${receiver})</p>`;
-    }
-
-    const formatDate = new Date(createdAt).toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-
-    item.innerHTML += `<time>${formatDate}</time>`;
-
-    return item;
 }
 
 /**
@@ -140,15 +165,15 @@ function disconnectUser() {
     item.innerHTML =
         '<p>⚠️ ¡Has sido desconectado porque has iniciado sesión en otra ventana!</p>';
 
-    messagesUl.append(item);
+    messagesDiv.append(item);
 
-    messagesUl.scrollTop = messagesUl.scrollHeight;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
     msgForm.innerHTML = '';
 }
 
 export {
-    showError,
+    showInfo as showError,
     listMessages,
     addSelectOptions,
     printMessages,

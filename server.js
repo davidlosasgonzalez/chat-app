@@ -30,7 +30,7 @@ app.post('/messages', isUser, newMessage);
 app.get('/messages', isUser, getMessages);
 
 // Error middleware.
-app.use((error, req, res, _) => {
+app.use((error, req, res, next) => {
     console.log(error.message);
     res.status(error.httpStatus || 500).send({
         status: 'error',
@@ -107,8 +107,6 @@ io.use((socket, next) => {
             receiverSocketId = receiver.socketId;
             msgInfo.receiverName = receiver.name;
         }
-
-        console.log(msgInfo);
 
         if (msgInfo.receiver) {
             io.to(receiverSocketId).emit('receive_message', msgInfo);

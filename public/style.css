@@ -24,9 +24,9 @@ div#register {
 }
 
 main.chatroom {
-    border: 1px solid #333;
     background-color: rgb(255, 255, 255);
     box-shadow: 6px 6px 15px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
     height: 600px;
     width: 1000px;
     margin: 6rem auto;
@@ -38,10 +38,8 @@ form.msg-form {
     background: #333;
     padding: 0.25rem;
     display: flex;
-    height: 3rem;
     box-sizing: border-box;
-    flex: 0 1 auto;
-    height: 50px;
+    height: 60px;
 }
 
 input.msg {
@@ -66,27 +64,124 @@ input.msg:focus {
     color: rgb(0, 0, 0);
 }
 
-ul.messages {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    flex: 1 1 auto;
+div.messages {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    width: 100%;
+    border: 1px solid #e5e5ea;
+    border-radius: 0.25rem;
+    font-family: 'SanFrancisco';
+    font-size: 1.25rem;
+    padding: 0.5rem 1.5rem;
     overflow-y: scroll;
 }
 
-::-webkit-scrollbar {
-    width: 0; /* Remove scrollbar space */
-    background: transparent; /* Optional: just make scrollbar invisible */
+/*::-webkit-scrollbar {
+    width: 0;  Remove scrollbar space 
+    background: transparent;  Optional: just make scrollbar invisible 
+} 
+*/
+
+div.messages > div {
+    border-radius: 1.15rem;
+    line-height: 1.25;
+    max-width: 75%;
+    padding: 0.5rem 0.875rem;
+    position: relative;
+    word-wrap: break-word;
 }
 
-ul.messages > li {
-    padding: 0.5rem 1rem;
+div::before,
+div::after {
+    bottom: -0.1rem;
+    content: '';
+    height: 1rem;
+    position: absolute;
 }
 
-ul.messages > li:nth-child(odd) {
-    background: #efefef;
+div.date-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    text-align: center;
+    align-self: center;
+    font-weight: bold;
+    width: 100%;
+    font-size: 1rem;
+    padding: 1rem;
+}
+
+div.date-info > hr {
+    height: 1px;
+    flex: 1 1 auto;
+    place-self: center;
+    background-color: #000;
+}
+
+div.date-info > div {
+    padding: 0.3rem;
+    margin: 0 0.5rem;
+    border-radius: 10px;
+    background-color: #e5e5ea;
+}
+
+div.from-me {
+    align-self: flex-end;
+    background-color: #248bf5;
+    color: #fff;
+}
+
+div.from-me::before {
+    border-bottom-left-radius: 0.8rem 0.7rem;
+    border-right: 1rem solid #248bf5;
+    right: -0.35rem;
+    transform: translate(0, -0.1rem);
+}
+
+div.from-me::after {
+    background-color: #fff;
+    border-bottom-left-radius: 0.5rem;
+    right: -40px;
+    transform: translate(-30px, -2px);
+    width: 10px;
+}
+
+div[class^='from-'] {
+    margin: 0.5rem 0;
+    width: fit-content;
+}
+
+div.from-me ~ div.from-me {
+    margin: 0.25rem 0 0;
+}
+
+div.from-me ~ div.from-me:not(:last-child) {
+    margin: 0.25rem 0 0;
+}
+
+div.from-me ~ div.from-me:last-child {
+    margin-bottom: 0.5rem;
+}
+
+div.from-them {
+    align-items: flex-start;
+    background-color: #e5e5ea;
+    color: #000;
+}
+
+div.from-them:before {
+    border-bottom-right-radius: 0.8rem 0.7rem;
+    border-left: 1rem solid #e5e5ea;
+    left: -0.35rem;
+    transform: translate(0, -0.1rem);
+}
+
+div.from-them::after {
+    background-color: #fff;
+    border-bottom-right-radius: 0.5rem;
+    left: 20px;
+    transform: translate(-30px, -2px);
+    width: 10px;
 }
 
 @media (max-width: 1200px) {
