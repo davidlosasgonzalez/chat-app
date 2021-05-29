@@ -1,79 +1,123 @@
-body {
+* {
     margin: 0;
-    background-color: rgb(187, 187, 187);
-    padding-bottom: 3rem;
+    padding: 0;
+}
+
+html {
+    font-size: 14px;
+    --grey-color: #333;
+}
+
+body {
+    display: grid;
+    grid-template-rows: 8% 85% 7%;
+    background-color: var(--grey-color);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
         Helvetica, Arial, sans-serif;
+    height: 100vh;
 }
 
 header {
-    background-color: #333;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
+    background-color: var(--grey-color);
 }
 
-div#register {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 25px;
-    place-content: center;
-    align-content: center;
-    justify-items: center;
-    align-items: center;
+header > div#register {
+    display: flex;
+    flex-direction: row;
+    place-content: flex-end;
+    place-items: center;
+    margin-right: 0.5rem;
+    height: 100%;
+}
+
+header > div#register > button.logout-btn {
+    background: transparent;
+    font-size: 2rem;
+    border: none;
+    outline: none;
 }
 
 main.chatroom {
     background-color: rgb(255, 255, 255);
-    box-shadow: 6px 6px 15px 5px rgba(0, 0, 0, 0.5);
-    border-radius: 5px;
-    height: 600px;
-    width: 1000px;
-    margin: 6rem auto;
-    display: flex;
-    flex-direction: column;
 }
 
-form.msg-form {
-    background: #333;
-    padding: 0.25rem;
+main.chatroom > form.login-form {
     display: flex;
+    flex-direction: column;
+    padding: 2.5rem;
     box-sizing: border-box;
-    height: 60px;
 }
 
-input.msg {
-    border: none;
-    padding: 0 1rem;
-    flex-grow: 1;
-    border-radius: 2rem;
-    margin: 0.25rem;
-}
-
-input.msg:focus {
+main.chatroom > form.login-form > input,
+main.chatroom > form.login-form > button {
+    height: 3rem;
     outline: none;
 }
 
-#form > button {
-    background: rgb(187, 187, 187);
-    border: none;
-    padding: 0 1rem;
-    margin: 0.25rem;
+main.chatroom > form.login-form > input,
+main.chatroom > form.login-form > button:nth-child(3) {
+    margin-bottom: 1rem;
+}
+
+main.chatroom > form.login-form > button {
+    background-color: rgba(0, 0, 0, 0.4);
+    font-size: 1.2rem;
     border-radius: 3px;
-    outline: none;
-    color: rgb(0, 0, 0);
+    border: none;
 }
 
-div.messages {
-    display: flex;
+main.chatroom > form.login-form > input {
+    font-size: 1.5rem;
+    padding-left: 5px;
+}
+
+main.chatroom > div.messages {
+    display: none;
     flex-direction: column;
-    height: 100%;
     border: 1px solid #e5e5ea;
     border-radius: 0.25rem;
     font-family: 'SanFrancisco';
     font-size: 1.25rem;
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 1rem;
     overflow-y: scroll;
+    max-height: 100%;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+}
+
+form.msg-form {
+    display: flex;
+    background: var(--grey-color);
+    padding: 0.3rem;
+}
+
+form.msg-form > select {
+    border: none;
+    border-radius: 3px;
+    outline: none;
+    width: 35px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+form.msg-form > input.msg {
+    border: none;
+    padding: 0 1rem;
+    flex-grow: 1;
+    border-radius: 2rem;
+    margin: 0 5px;
+}
+
+form.msg-form > input.msg:focus {
+    outline: none;
+}
+
+form.msg-form > button.msg-btn {
+    background: rgba(255, 255, 255, 0.2);
+    font-size: 2rem;
+    border: none;
+    border-radius: 3px;
+    outline: none;
+    color: rgb(0, 0, 0);
 }
 
 /*::-webkit-scrollbar {
@@ -89,6 +133,30 @@ div.messages > div {
     padding: 0.5rem 0.875rem;
     position: relative;
     word-wrap: break-word;
+}
+
+div.messages > div > p:first-child {
+    display: flex;
+    align-items: center;
+}
+
+div.messages > div > p:first-child > span {
+    font-size: 0.7rem;
+    margin-right: 3px;
+}
+
+div.messages > div > p:first-child > strong {
+    font-size: 1rem;
+}
+
+div.messages > div > time {
+    font-size: 0.8rem;
+    float: right;
+    margin-top: 5px;
+}
+
+div.messages > div.from-them > time {
+    float: left;
 }
 
 div::before,
@@ -182,10 +250,4 @@ div.from-them::after {
     left: 20px;
     transform: translate(-30px, -2px);
     width: 10px;
-}
-
-@media (max-width: 1200px) {
-    main.chatroom {
-        width: 750px;
-    }
 }

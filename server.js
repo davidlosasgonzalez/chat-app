@@ -63,7 +63,7 @@ io.use((socket, next) => {
         );
 
         // Add new user to "connectedUsers".
-        const { name, id } = user;
+        const { id, name, color } = user;
 
         const userExists = connectedUsers.find((user) => {
             return user.name === name && user.id === id;
@@ -72,6 +72,7 @@ io.use((socket, next) => {
         connectedUsers.push({
             id,
             name,
+            color,
             socketId: socket.id,
         });
 
@@ -96,7 +97,8 @@ io.use((socket, next) => {
             (user) => user.socketId === socket.id
         );
 
-        msgInfo.senderName = (sender && sender.name) || null;
+        msgInfo.senderName = sender.name;
+        msgInfo.senderColor = sender.color;
 
         let receiverSocketId;
 

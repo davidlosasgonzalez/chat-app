@@ -52,7 +52,7 @@ const newMessage = (req, res, next) => {
 
         res.send({
             status: 'ok',
-            message: 'User created!',
+            message: 'Message created!',
         });
     } catch (error) {
         next(error);

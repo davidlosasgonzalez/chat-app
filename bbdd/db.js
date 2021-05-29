@@ -11,6 +11,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS users(
     id INTEGER UNIQUE NOT NULL, 
     name VARCHAR(50) NOT NULL UNIQUE,  
     password VARCHAR(512) NOT NULL,
+    color VARCHAR(15) NOT NULL,
     lastToken VARCHAR(300),  
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY("id" AUTOINCREMENT)
@@ -37,9 +38,13 @@ db.exec(`CREATE TABLE IF NOT EXISTS messages(
 
 db.exec(`PRAGMA foreign_keys = ON;`);
 
-db.exec(`INSERT INTO users(name, password) VALUES('Vacaloura', '12345');`);
+db.exec(
+    `INSERT INTO users(name, password, color) VALUES('Vacaloura', '12345', '123,43,60');`
+);
 
-db.exec(`INSERT INTO users(name, password) VALUES('Porcoteixo', '12345');`);
+db.exec(
+    `INSERT INTO users(name, password, color) VALUES('Porcoteixo', '12345', '23,149,90');`
+);
 
 db.exec(
     `INSERT INTO messages(text, idSender, idReceiver, createdAt) VALUES('¿Qué tal?', 1, 2, CURRENT_TIMESTAMP);`

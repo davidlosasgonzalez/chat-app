@@ -9,7 +9,7 @@ let day = 0;
  * ##################
  */
 function listMessages(msgInfo, currentUser) {
-    const { sender, createdAt } = msgInfo;
+    const { sender, senderColor, createdAt } = msgInfo;
     const receiver = msgInfo.receiver ? msgInfo.receiver : null;
     let { text } = msgInfo;
 
@@ -21,11 +21,20 @@ function listMessages(msgInfo, currentUser) {
     if (!receiver && sender === currentUser) {
         item.innerHTML = `<p>${text}</p>`;
     } else if (!receiver && sender !== currentUser) {
-        item.innerHTML = `<p><strong>${sender}:</strong> ${text}</p>`;
+        item.innerHTML = `
+            <p><strong style="color: rgb(${senderColor}">${sender}</strong></p> 
+            <p>${text}</p>
+        `;
     } else if (receiver && sender !== currentUser) {
-        item.innerHTML += `<p>⛔️ <strong>${sender}:</strong> ${text}</p>`;
+        item.innerHTML += `
+            <p><span>⛔️</span> <strong style="color: rgb(${senderColor}">${sender}</strong></p>
+            <p>${text}</p>
+        `;
     } else {
-        item.innerHTML += `<p>⛔️ ${text} (to ${receiver})</p>`;
+        item.innerHTML += `
+            <p><span>⛔️</span> <strong>To ${receiver}</strong></p>
+            <p>${text}</p>
+        `;
     }
 
     const formatDate = new Date(createdAt).toLocaleTimeString('es-ES', {
@@ -55,6 +64,7 @@ function printMessages(messages, username) {
         for (const msg of messages) {
             const msgInfo = {
                 sender: msg.senderName,
+                senderColor: msg.senderColor,
                 receiver: msg.receiverName,
                 text: msg.text,
                 createdAt: msg.createdAt,
@@ -129,7 +139,7 @@ function showInfo(msg, color) {
  * ######################
  */
 function addSelectOptions(userlist, currentUser) {
-    msgForm.elements[0].innerHTML = `<option value="">Destinatario</option>`;
+    msgForm.elements[0].innerHTML = `<option value="">👥</option>`;
 
     for (const user of userlist) {
         if (currentUser === user.name) continue;
@@ -142,7 +152,7 @@ function addSelectOptions(userlist, currentUser) {
             // Create a new option with the user name.
             const option = document.createElement('option');
             option.setAttribute('value', user.name);
-            option.textContent = user.name;
+            option.textContent = `⛔ ${user.name}`;
 
             // Append option to select and remove disable attribute.
             msgForm.elements[0].append(option);
@@ -173,7 +183,7 @@ function disconnectUser() {
 }
 
 export {
-    showInfo as showError,
+    showInfo,
     listMessages,
     addSelectOptions,
     printMessages,

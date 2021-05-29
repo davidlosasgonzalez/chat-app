@@ -26,6 +26,7 @@ const loginUser = (req, res, next) => {
         const tokenInfo = {
             id: user[0].id,
             name: user[0].name,
+            color: user[0].color,
         };
 
         let token;

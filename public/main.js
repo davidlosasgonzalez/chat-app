@@ -1,15 +1,16 @@
-import { showError as showInfo, printMessages } from './helpers.js';
+import { showInfo, printMessages } from './helpers.js';
 import { userMessage } from './socket.js';
 
 const header = document.querySelector('body > header');
-const loginForm = document.querySelector('header > form.login-form');
+const loginForm = document.querySelector('form.login-form');
 const registerDiv = document.querySelector('div#register');
 const loginBtn = document.querySelector('button#login-btn');
 const registerBtn = document.querySelector('button#register-btn');
 const inputMsg = document.querySelector('input.msg');
-const msgForm = document.querySelector('main > form.msg-form');
+const msgForm = document.querySelector('form.msg-form');
 const select = document.querySelector('select#user');
 const messagesDiv = document.querySelector('div.messages');
+const audioContainer = document.querySelector('#audioContainer');
 
 /**
  * #####################
@@ -57,9 +58,27 @@ loginBtn.addEventListener('click', async (e) => {
 header.addEventListener('click', (e) => {
     e.preventDefault();
 
-    if (e.target.matches('button#logout-btn')) {
+    if (e.target.matches('button.logout-btn')) {
         localStorage.removeItem('token');
         window.location.reload();
+    }
+});
+
+/**
+ * ###################
+ * ## selectHandler ##
+ * ###################
+ */
+select.addEventListener('change', (e) => {
+    const option = e.target;
+
+    if (option.value) {
+        inputMsg.setAttribute(
+            'placeholder',
+            `Direct message to ${option.value}`
+        );
+    } else {
+        inputMsg.removeAttribute('placeholder');
     }
 });
 
@@ -72,11 +91,12 @@ function addLogoutButton(user) {
     registerDiv.innerHTML = '';
 
     // Hide login form data.
-    loginForm.style.visibility = 'hidden';
+    loginForm.style.display = 'none';
+    messagesDiv.style.display = 'flex';
 
     // Create a paragraph with user name.
     const p = document.createElement('p');
-    p.textContent = user.name;
+    p.textContent = `🟢 ${user.name}`;
     p.style.cssText = `
             margin-right: 10px;
             color: #fff;
@@ -85,8 +105,8 @@ function addLogoutButton(user) {
 
     // Create a button to logout.
     const logoutBtn = document.createElement('button');
-    logoutBtn.setAttribute('id', 'logout-btn');
-    logoutBtn.textContent = 'Logout';
+    logoutBtn.setAttribute('class', 'logout-btn');
+    logoutBtn.textContent = '🔒';
 
     // Append button to header.
     registerDiv.append(p, logoutBtn);
@@ -130,6 +150,8 @@ msgForm.addEventListener('submit', async (e) => {
             if (data.status === 'error') {
                 throw new Error(data.message);
             }
+
+            audioContainer.play();
 
             userMessage(msgInfo);
 

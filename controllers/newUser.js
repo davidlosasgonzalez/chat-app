@@ -2,6 +2,14 @@ const path = require('path');
 const dbPath = path.join(__dirname, '../bbdd/chatroom.db');
 const db = require('better-sqlite3')(dbPath);
 
+function randomDarkColor() {
+    let color = '';
+    for (let i = 0; i < 3; i++) {
+        color += `${Math.floor(Math.random() * 151)},`;
+    }
+    return color.slice(0, color.length - 1);
+}
+
 const newUser = (req, res, next) => {
     try {
         const { name, password } = req.body;
@@ -31,9 +39,9 @@ const newUser = (req, res, next) => {
 
         // Insert user in db.
         db.prepare(
-            `INSERT INTO users(name, password)
-                VALUES(?, ?);`
-        ).run(name, password);
+            `INSERT INTO users(name, password, color)
+                VALUES(?, ?, ?);`
+        ).run(name, password, randomDarkColor());
 
         res.send({
             status: 'ok',
