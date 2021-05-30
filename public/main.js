@@ -1,4 +1,4 @@
-import { showInfo, printMessages } from './helpers.js';
+import { printMessages, showInfo } from './helpers.js';
 import { userMessage } from './socket.js';
 
 const header = document.querySelector('body > header');
