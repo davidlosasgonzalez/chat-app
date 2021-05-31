@@ -1,8 +1,8 @@
 require('dotenv').config();
 const { PORT } = process.env;
 const express = require('express');
-const path = require('path');
 const morgan = require('morgan');
+const cors = require('cors');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
@@ -20,8 +20,16 @@ const isUser = require('./middlewares/isUser');
 // Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '/public')));
 app.use(morgan('dev'));
+
+// Add Access Control Allow Origin headers
+app.use(
+    cors({
+        origin: '*',
+        methods: 'GET,POST',
+        optionsSuccessStatus: 200,
+    })
+);
 
 // Routes
 app.post('/users', newUser);
