@@ -1,6 +1,8 @@
-//import { io } from "socket.io-client";
-import { addSelectOptions, disconnectUser, printMessages } from './helpers.js';
+import { addSelectOptions } from './lib/addSelectOptions.js';
+import { printMessages } from './lib/messages.js';
+import { disconnectUser } from './lib/disconnectUser.js';
 
+// We will keep the current user data in this variable.
 let currentUser;
 
 const token = JSON.parse(localStorage.getItem('token'));
@@ -23,6 +25,7 @@ socket.on('username', (username) => {
     currentUser = username;
 });
 
+// Send current user info to server.
 function connectUser(currentUser) {
     socket.emit('connectUser', currentUser);
 }
@@ -40,6 +43,7 @@ socket.on('receive_message', (msgInfo) => {
 // If a new user logs in a new <option> is added
 // to <select>.
 socket.on('userlist', (userlist) => {
+    console.log(userlist, currentUser);
     addSelectOptions(userlist, currentUser);
 });
 

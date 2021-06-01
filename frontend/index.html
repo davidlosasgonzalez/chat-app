@@ -15,7 +15,7 @@
     <body>
         <div class="wrapper">
             <header>
-                <div id="register"></div>
+                <div class="register"></div>
             </header>
             <main class="chatroom">
                 <form class="login-form" action="">
@@ -25,20 +25,20 @@
                         name="password"
                         placeholder="password"
                     />
-                    <button id="login-btn">Login</button>
-                    <button id="register-btn">Register</button>
+                    <button class="login-btn">Login</button>
+                    <button class="register-btn">Register</button>
                 </form>
                 <div class="messages"></div>
             </main>
             <form class="msg-form" action="">
-                <select name="userlist" id="user" disabled>
+                <select name="userlist" class="users" disabled>
                     <option value="">👥</option>
                 </select>
                 <input class="msg" name="msg" autocomplete="off" disabled />
                 <button class="msg-btn" disabled>💬</button>
             </form>
         </div>
-        <audio id="audioContainer">
+        <audio class="audioContainer">
             <source src="./media/bubble.wav" type="audio/wav" />
         </audio>
         <script src="http://localhost:4000/socket.io/socket.io.js"></script>

@@ -9,7 +9,7 @@ const loginUser = (req, res, next) => {
 
         if (!name || !password) {
             const error = new Error('Missing inputs!');
-            error.httpStatus = 400;
+            error.httpStatus = 409;
             throw error;
         }
 
@@ -37,7 +37,7 @@ const loginUser = (req, res, next) => {
             });
         } catch (err) {
             const error = new Error('Incorrect username or password!');
-            error.httpStatus = 400;
+            error.httpStatus = 401;
             throw error;
         }
 

@@ -32,7 +32,7 @@ const newMessage = (req, res, next) => {
         // Check if sender exists.
         if (existingSender.length < 1) {
             const error = new Error('User not found!');
-            error.httpStatus = 409;
+            error.httpStatus = 404;
             throw error;
         }
 

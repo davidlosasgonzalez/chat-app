@@ -1,60 +1,73 @@
-import { printMessages, showInfo } from './helpers.js';
+import { printMessages } from './lib/messages.js';
+import { messageInfo } from './lib/messageInfo.js';
+import { addLogoutButton } from './lib/addLogoutButton.js';
+import { getQuery } from './lib/credentialsQuery.js';
 import { userMessage, connectUser } from './socket.js';
 
 const header = document.querySelector('body > div > header');
-const loginForm = document.querySelector('form.login-form');
-const registerDiv = document.querySelector('div#register');
-const loginBtn = document.querySelector('button#login-btn');
-const registerBtn = document.querySelector('button#register-btn');
-const inputMsg = document.querySelector('input.msg');
 const msgForm = document.querySelector('form.msg-form');
-const select = document.querySelector('select#user');
+const loginForm = document.querySelector('form.login-form');
+const registerBtn = document.querySelector('button.register-btn');
+const loginBtn = document.querySelector('button.login-btn');
 const messagesDiv = document.querySelector('div.messages');
-const audioContainer = document.querySelector('#audioContainer');
+const usersSelect = document.querySelector('select.users');
+const audioContainer = document.querySelector('.audioContainer');
 
-/**
- * #####################
- * ## Register Button ##
- * #####################
- */
+// Register button click event.
 registerBtn.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    try {
-        await credentialsQuery('http://localhost:4000/users');
+    const name = loginForm.elements.name.value;
+    const password = loginForm.elements.password.value;
 
-        showInfo('Registration completed! Please, login to chat!', 'green');
+    const bodyParams = {
+        name,
+        password,
+    };
+
+    try {
+        await getQuery('http://localhost:4000/users', 'post', bodyParams);
+
+        messageInfo('Registration completed! Please, login to chat!', 'green');
     } catch (error) {
-        showInfo(error.message, '#E65A3C');
+        messageInfo(error.message, '#E65A3C');
     }
+
+    loginForm.elements.name.value = '';
+    loginForm.elements.password.value = '';
 });
 
-/**
- * ##################
- * ## Login Button ##
- * ##################
- */
+// Login button click event.
 loginBtn.addEventListener('click', async (e) => {
     e.preventDefault();
 
+    const name = loginForm.elements.name.value;
+    const password = loginForm.elements.password.value;
+
+    const bodyParams = {
+        name,
+        password,
+    };
+
     try {
-        const { data } = await credentialsQuery(
-            'http://localhost:4000/users/login'
+        const { data } = await getQuery(
+            'http://localhost:4000/users/login',
+            'post',
+            bodyParams
         );
 
         localStorage.setItem('token', JSON.stringify(data.token));
 
         render();
     } catch (error) {
-        showInfo(error.message, '#E65A3C');
+        messageInfo(error.message, '#E65A3C');
     }
+
+    loginForm.elements.name.value = '';
+    loginForm.elements.password.value = '';
 });
 
-/**
- * ###################
- * ## Logout Button ##
- * ###################
- */
+// Logout button click event.
 header.addEventListener('click', (e) => {
     e.preventDefault();
 
@@ -64,62 +77,25 @@ header.addEventListener('click', (e) => {
     }
 });
 
-/**
- * ###################
- * ## selectHandler ##
- * ###################
- */
-select.addEventListener('change', (e) => {
+// Select input change event.
+usersSelect.addEventListener('change', (e) => {
     const option = e.target;
 
     if (option.value) {
-        inputMsg.setAttribute(
+        msgInput.setAttribute(
             'placeholder',
             `Direct message to ${option.value}`
         );
     } else {
-        inputMsg.removeAttribute('placeholder');
+        msgInput.removeAttribute('placeholder');
     }
 });
 
-/**
- * #####################
- * ## addLogoutButton ##
- * #####################
- */
-function addLogoutButton(user) {
-    registerDiv.innerHTML = '';
-
-    // Hide login form data.
-    loginForm.style.display = 'none';
-    messagesDiv.style.display = 'flex';
-
-    // Create a paragraph with user name.
-    const p = document.createElement('p');
-    p.textContent = `🟢 ${user.name}`;
-
-    // Create a button to logout.
-    const logoutBtn = document.createElement('button');
-    logoutBtn.setAttribute('class', 'logout-btn');
-    logoutBtn.textContent = '🔒';
-
-    // Append button to header.
-    registerDiv.append(p, logoutBtn);
-
-    msgForm.elements[0].removeAttribute('disabled');
-    msgForm.elements[1].removeAttribute('disabled');
-    msgForm.elements[2].removeAttribute('disabled');
-}
-
-/**
- * ##################
- * ## Send Message ##
- * ##################
- */
+// Message form submit event.
 msgForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (inputMsg.value) {
+    if (msgInput.value) {
         try {
             const token = JSON.parse(localStorage.getItem('token'));
 
@@ -128,76 +104,38 @@ msgForm.addEventListener('submit', async (e) => {
                 Authorization: token,
             });
 
-            const msgInfo = {
-                text: inputMsg.value,
-                receiver: select.value || null,
+            const bodyParams = {
+                text: msgInput.value,
+                receiver: usersSelect.value || null,
                 createdAt: new Date()
                     .toISOString()
                     .slice(0, 19)
                     .replace('T', ' '),
             };
 
-            const response = await fetch('http://localhost:4000/messages', {
-                method: 'post',
-                body: JSON.stringify(msgInfo),
-                headers: myHeaders,
-            });
-
-            const data = await response.json();
+            const data = await getQuery(
+                'http://localhost:4000/users/messages',
+                'post',
+                bodyParams,
+                myHeaders
+            );
 
             if (data.status === 'error') {
                 throw new Error(data.message);
             }
-            +audioContainer.play();
+
+            audioContainer.play();
 
             userMessage(msgInfo);
 
-            inputMsg.value = '';
+            msgInput.value = '';
         } catch (error) {
             throw new Error(error.message);
         }
     }
 });
 
-/**
- * ######################
- * ## credentialsQuery ##
- * ######################
- */
-async function credentialsQuery(URL) {
-    const name = loginForm.elements.name.value;
-    const password = loginForm.elements.password.value;
-
-    const params = {
-        name,
-        password,
-    };
-
-    const response = await fetch(URL, {
-        method: 'post',
-        body: JSON.stringify(params),
-        headers: {
-            'Content-type': 'application/json',
-        },
-    });
-
-    const data = await response.json();
-
-    if (data.status === 'error') {
-        throw new Error(data.message);
-    }
-
-    loginForm.elements.name.value = '';
-    loginForm.elements.password.value = '';
-
-    return data;
-}
-
-/**
- * ############
- * ## Render ##
- * ############
- */
+// Render page.
 async function render() {
     try {
         const token = JSON.parse(localStorage.getItem('token')) || '';
@@ -207,15 +145,13 @@ async function render() {
             Authorization: token,
         });
 
-        const response = await fetch('http://localhost:4000/messages', {
-            method: 'get',
-            headers: myHeaders,
-        });
+        const { data } = await getQuery(
+            'http://localhost:4000/messages',
+            'get',
+            null,
+            myHeaders
+        );
 
-        const { data } = await response.json();
-
-        // Si no existe data daremos por hecho que el usuario no tiene
-        // un token válido.
         if (!data) return false;
 
         const { user, messages } = data;
@@ -230,7 +166,6 @@ async function render() {
 
         return true;
     } catch (error) {
-        console.log(error.message);
         console.error('Authentication error');
     }
 }

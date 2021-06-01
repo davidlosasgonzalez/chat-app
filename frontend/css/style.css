@@ -19,10 +19,10 @@ body {
 
 div.wrapper {
     display: grid;
-    max-width: 1200px;
-    margin: 0 auto;
     grid-template-rows: auto 84% auto;
     height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
     box-shadow: 10px 10px 30px 30px rgba(0, 0, 0, 0.5);
 }
 
@@ -30,27 +30,26 @@ header {
     background-color: var(--darkgrey-color);
 }
 
-header > div#register {
+header > div.register {
     display: flex;
     flex-direction: row;
     place-content: space-between;
     place-items: center;
-    padding: 0 0.5rem 0 1rem;
-    margin-right: 0.5rem;
     height: 100%;
+    margin-right: 0.5rem;
+    padding: 0 0.5rem 0 1rem;
 }
 
-header > div#register > p {
-    color: white;
+header > div.register > p {
     font-size: 1.3rem;
     font-weight: bold;
+    color: white;
 }
 
-header > div#register > button.logout-btn {
-    background: transparent;
+header > div.register > button.logout-btn {
     font-size: 2rem;
     border: none;
-    outline: none;
+    background: transparent;
 }
 
 main.chatroom {
@@ -60,10 +59,10 @@ main.chatroom {
 main.chatroom > form.login-form {
     display: flex;
     flex-direction: column;
-    padding: 2.5rem;
-    box-sizing: border-box;
     max-width: 1080px;
     margin: 0 auto;
+    padding: 2.5rem;
+    box-sizing: border-box;
 }
 
 main.chatroom > form.login-form > input,
@@ -91,6 +90,12 @@ main.chatroom > form.login-form > input {
 }
 
 main.chatroom > form.login-form > input:-webkit-autofill::first-line {
+    font-size: 1.3rem;
+}
+
+main.chatroom > form.login-form > p.msg-info {
+    text-align: center;
+    margin-top: 1rem;
     font-size: 1.3rem;
 }
 
@@ -176,90 +181,100 @@ div.messages > div.from-them > time {
     float: left;
 }
 
-div::before,
+/* div::before,
 div::after {
     bottom: -0.1rem;
     content: '';
     height: 1rem;
     position: absolute;
-}
+} */
 
-div.date-info {
+div.messages > div.date-info {
     place-self: center;
-    font-weight: bold;
-    font-size: 1rem;
     margin: 2rem;
     width: fit-content;
+    font-size: 1rem;
     letter-spacing: 1px;
-    border: 1px dashed black;
+    font-weight: bold;
     border-radius: 10px;
+    border: 1px dashed var(--darkgrey-color);
+    color: var(--darkgrey-color);
 }
 
-div.date-info:first-child {
+div.messages > div.date-info:first-child {
     margin-top: 1rem;
 }
 
-div.from-me {
+div.messages > div.from-me {
     align-self: flex-end;
-    background-color: var(--blue-color);
-    color: white;
     border-radius: 1.15rem 1.15rem 0 1.15rem;
+    color: white;
+    background-color: var(--blue-color);
 }
 
-div.from-me::before {
+div.messages > div.from-me::before {
+    right: -0.35rem;
     border-bottom-left-radius: 0.8rem 0.7rem;
     border-right: 1rem solid var(--blue-color);
-    right: -0.35rem;
     transform: translate(0, -0.1rem);
 }
 
-div.from-me::after {
-    background-color: white;
+div.messages > div.from-me::after {
+    width: 11.2px;
+    right: -40.8px;
     border-bottom-left-radius: 0.4rem;
     border-top: 1px solid transparent;
-    right: -40.8px;
     transform: translate(-30px, -2px);
-    width: 11.2px;
+    background-color: white;
 }
 
-div[class^='from-'] {
+div.messages > div[class^='from-'] {
     margin: 0.5rem 0;
     width: fit-content;
 }
 
-div.from-me ~ div.from-me {
+div.messages > div.from-me ~ div.from-me {
     margin: 0.25rem 0 0;
 }
 
-div.from-me ~ div.from-me:not(:last-child) {
+div.messages > div.from-me ~ div.from-me:not(:last-child) {
     margin: 0.25rem 0 0;
 }
 
-div.from-me ~ div.from-me:last-child {
+div.messages > div.from-me ~ div.from-me:last-child {
     margin-bottom: 0.5rem;
 }
 
-div.from-them {
+div.messages > div.from-them {
     align-items: flex-start;
     border-radius: 1.15rem 1.15rem 1.15rem 0;
-    background-color: var(--lightgrey-color);
     color: dark;
+    background-color: var(--lightgrey-color);
 }
 
-div.from-them:before {
+div.messages > div.from-them:before {
+    left: -0.35rem;
     border-bottom-right-radius: 0.8rem 0.7rem;
     border-left: 1rem solid var(--lightgrey-color);
-    left: -0.35rem;
     transform: translate(0, -0.1rem);
 }
 
-div.from-them::after {
-    background-color: white;
+div.messages > div.from-them::after {
+    left: 19.2px;
+    width: 11.2px;
     border-bottom-right-radius: 0.5rem;
     border-top: 1px solid transparent;
-    left: 19.2px;
     transform: translate(-30px, -2px);
-    width: 11.2px;
+    background-color: white;
+}
+
+div.multisession {
+    display: flex;
+}
+
+div.multisession > p:last-child {
+    font-size: 1rem;
+    margin-left: 0.5rem;
 }
 
 @media (min-width: 400px) {
@@ -295,10 +310,10 @@ div.from-them::after {
     }
 
     main.chatroom > div.messages::-webkit-scrollbar-thumb {
-        background-color: var(--grey-color);
-        border-radius: 20px;
-        border: 6px solid transparent;
-        background-clip: content-box;
         height: 10px;
+        border: 6px solid transparent;
+        border-radius: 20px;
+        background-clip: content-box;
+        background-color: var(--grey-color);
     }
 }
