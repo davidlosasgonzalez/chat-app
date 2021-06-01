@@ -1,38 +1,48 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
-    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
-    <title>Socket.IO chat</title>
-  </head>
-  <body>
-    <header>
-      <div id="register"></div>
-    </header>
-    <main class="chatroom">
-      <form class="login-form" action="">
-        <input type="text" name="name" placeholder="name" />
-        <input type="password" name="password" placeholder="password" />
-        <button id="login-btn">Login</button>
-        <button id="register-btn">Register</button>
-      </form>
-      <div class="messages"></div>
-    </main>
-    <form class="msg-form" action="">
-      <select name="userlist" id="user" disabled>
-        <option value="">👥</option>
-      </select>
-      <input class="msg" name="msg" autocomplete="off" disabled />
-      <button class="msg-btn" disabled>💬</button>
-    </form>
-    <audio id="audioContainer">
-      <source src="./bubble.wav" type="audio/wav" />
-    </audio>
-    <script src="http://localhost:4000/socket.io/socket.io.js"></script>
-    <script type="module" src="./main.js"></script>
-    <script type="module" src="./socket.js"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="./css/style.css" />
+        <link
+            rel="shortcut icon"
+            href="./media/favicon.ico"
+            type="image/x-icon"
+        />
+        <title>Socket.IO chat</title>
+    </head>
+    <body>
+        <div class="wrapper">
+            <header>
+                <div id="register"></div>
+            </header>
+            <main class="chatroom">
+                <form class="login-form" action="">
+                    <input type="text" name="name" placeholder="name" />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="password"
+                    />
+                    <button id="login-btn">Login</button>
+                    <button id="register-btn">Register</button>
+                </form>
+                <div class="messages"></div>
+            </main>
+            <form class="msg-form" action="">
+                <select name="userlist" id="user" disabled>
+                    <option value="">👥</option>
+                </select>
+                <input class="msg" name="msg" autocomplete="off" disabled />
+                <button class="msg-btn" disabled>💬</button>
+            </form>
+        </div>
+        <audio id="audioContainer">
+            <source src="./media/bubble.wav" type="audio/wav" />
+        </audio>
+        <script src="http://localhost:4000/socket.io/socket.io.js"></script>
+        <script type="module" src="./js/main.js"></script>
+        <script type="module" src="./js/socket.js"></script>
+    </body>
 </html>

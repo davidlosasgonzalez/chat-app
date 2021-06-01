@@ -26,8 +26,6 @@ app.use(morgan('dev'));
 app.use(
     cors({
         origin: '*',
-        methods: 'GET,POST',
-        optionsSuccessStatus: 200,
     })
 );
 
@@ -70,7 +68,13 @@ io.use((socket, next) => {
             }
         );
 
-        // Add new user to "connectedUsers".
+        next();
+    } else {
+        next(new Error('Authentication error'));
+    }
+}).on('connect', (socket) => {
+    // Add new user to "connectedUsers".
+    socket.on('connectUser', (user) => {
         const { id, name, color } = user;
 
         const userExists = connectedUsers.find((user) => {
@@ -84,21 +88,15 @@ io.use((socket, next) => {
             socketId: socket.id,
         });
 
-        io.on('connect', () => {
-            io.to(socket.id).emit('username', user.name);
+        io.to(socket.id).emit('username', user.name);
 
-            if (!userExists) {
-                io.emit('userlist', connectedUsers);
-            } else {
-                io.to(userExists.socketId).emit('multisession');
-            }
-        });
+        if (!userExists) {
+            io.emit('userlist', connectedUsers);
+        } else {
+            io.to(userExists.socketId).emit('multisession');
+        }
+    });
 
-        next();
-    } else {
-        next(new Error('Authentication error'));
-    }
-}).on('connect', (socket) => {
     // User send a new message.
     socket.on('send_message', (msgInfo) => {
         const sender = connectedUsers.find(

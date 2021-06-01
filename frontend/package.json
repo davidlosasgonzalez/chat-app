@@ -5,15 +5,13 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "browser-sync start --server '.' --files '.'"
+    "start": "live-server --host=localhost --port=3000"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "browser-sync": "^2.26.14"
-  },
   "dependencies": {
+    "live-server": "^1.2.1",
     "socket.io": "^2.4.0",
     "socket.io-client": "^2.4.0"
   }
