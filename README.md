@@ -14,7 +14,7 @@ Real-time chat between two or more people.
 
 -   **Possibility of sending and receiving messages between two or more users.** The exchange of messages will take place in a single `<div>` where messages will be aggregated as users send them.
 
--   **Possibility to send and receive messages privately between two users.** The exchange of messages will take place in the same `<div>` where general messages are received, but will only be accessible to the sender and receiver of the message.
+-   **Possibility to send and receive messages privately between two users.** The exchange of messages will take place in the same `<div>` where general messages are received, but will only be accessible to the sender and receiver of the message. A private message can be distinguished by the ⛔️ icon.
 
 -   **Possibility to send links.** If the text sent contains a link it is formatted to construct a clickable hyperlink.
 
