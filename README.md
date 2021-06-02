@@ -1,6 +1,6 @@
 # Socket<span>.IO</span> - Chat
 
-Real-time chat between two or more people developed with the help of [Node.js](https://nodejs.org/es/) and Socket.io.
+Real-time chat between two or more people. The backend is developed with [Node.js](https://nodejs.org/es/) and the frontend is developed with HTML, CSS & JavaScript vanilla. [Socket.io](https://socket.io/) is used in both environments.
 
 ## Features
 
