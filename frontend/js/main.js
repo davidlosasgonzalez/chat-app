@@ -6,6 +6,7 @@ import { userMessage, connectUser } from './socket.js';
 
 const header = document.querySelector('body > div > header');
 const msgForm = document.querySelector('form.msg-form');
+const msgInput = document.querySelector('.msg-form .msg');
 const loginForm = document.querySelector('form.login-form');
 const registerBtn = document.querySelector('button.register-btn');
 const loginBtn = document.querySelector('button.login-btn');
@@ -114,7 +115,7 @@ msgForm.addEventListener('submit', async (e) => {
             };
 
             const data = await getQuery(
-                'http://localhost:4000/users/messages',
+                'http://localhost:4000/messages',
                 'post',
                 bodyParams,
                 myHeaders
@@ -126,7 +127,7 @@ msgForm.addEventListener('submit', async (e) => {
 
             audioContainer.play();
 
-            userMessage(msgInfo);
+            userMessage(bodyParams);
 
             msgInput.value = '';
         } catch (error) {

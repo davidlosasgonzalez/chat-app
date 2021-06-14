@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "live-server": "^1.2.1",
+    "live-server": "^1.1.0",
     "socket.io": "^2.4.0",
     "socket.io-client": "^2.4.0"
   }
